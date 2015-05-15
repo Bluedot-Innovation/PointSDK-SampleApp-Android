@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="app_name">PointDemoApp</string>
+    <string name="title_section1">Auth</string>
+    <string name="title_section2">Map</string>
+    <string name="title_section3">Checklist</string>
+    <string name="action_settings">Log Out</string>
+    <string name="error_toast_message">Opps!! Application Crashed</string>
+    <string name="enter_email">Your e-mail address</string>
+    <string name="enter_apikey">Bluedot API Key</string>
+    <string name="enter_package">Package Name</string>
+    <string name="save_authenticate">Log in</string>
+    <string name="clear_logout">Log out</string>
+    <string name="please_wait_authenticating">Authenticating &#8230; </string>
+    <string name="please_wait_download">Downloading data &#8230; </string>
+    <string name="loggned_in_as">You are logged in as</string>
+    <string name="fence_name">Fence : </string>
+    <string name="fence_distance">Distance : </string>
+    <string name="hold_for_gps">Hold to show device location</string>
+    <string name="power_consumption_title">Power Consumption</string>
+    <string name="power_consumption_message">Holding the button to show your location uses Google Location Services that drains power at a high rate. Without the button held, your actions will still trigger using the energy efficient Bluedot Point SDK</string>
+    <string name="yes">Yes</string>
+    <string name="no">No</string>
+    <string name="ok">OK</string>
+
+</resources>

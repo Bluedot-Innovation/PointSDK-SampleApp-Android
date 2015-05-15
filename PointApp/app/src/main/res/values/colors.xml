@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <color name="tab_text_color">#000000</color>
+    <color name="white">#88FFFFFF</color>
+    <color name="blue_text">#429bd5</color>
+    <color name="grey_text">#625D5D</color>
+    <color name="bluedot_color">#429bd5</color>
+    <color name="grey_color">#333333</color>
+
+</resources>

@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content" >
+
+    <ImageView
+        android:id="@+id/img_fence_name"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:src="@drawable/ic_launcher" />
+
+    <RelativeLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerVertical="true"
+        android:layout_toRightOf="@+id/img_fence_name" >
+
+        <TextView
+            android:id="@+id/txt_fence_name_title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="5dp"
+            android:text="@string/fence_name" />
+
+        <TextView
+            android:id="@+id/txt_fence_name"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="5dp"
+            android:layout_toRightOf="@+id/txt_fence_name_title"
+            android:textAllCaps="true"
+            android:textColor="@color/bluedot_color"
+            android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/txt_distance_from_fence_title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/txt_fence_name_title"
+            android:text="@string/fence_distance" />
+
+        <TextView
+            android:id="@+id/txt_distance_from_fence"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/txt_fence_name"
+            android:layout_toRightOf="@+id/txt_distance_from_fence_title" />
+    </RelativeLayout>
+
+</RelativeLayout>

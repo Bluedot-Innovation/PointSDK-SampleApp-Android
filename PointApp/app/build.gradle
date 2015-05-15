@@ -1,0 +1,27 @@
+apply plugin: 'com.android.application'
+
+android {
+    compileSdkVersion 'Google Inc.:Google APIs:21'
+    buildToolsVersion "21.1.2"
+
+    defaultConfig {
+        applicationId "com.bluedotinnovation.android.pointapp"
+        minSdkVersion 14
+        targetSdkVersion 21
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.txt'
+        }
+    }
+}
+
+dependencies {
+    compile files('libs/acra-4.5.0.jar')
+    compile files('libs/bluedot-point-sdk-release.jar')
+    compile 'com.google.android.gms:play-services-maps:6.+'
+    compile 'com.android.support:appcompat-v7:21.0.+'
+    compile 'com.google.maps.android:android-maps-utils:0.3+'
+}
