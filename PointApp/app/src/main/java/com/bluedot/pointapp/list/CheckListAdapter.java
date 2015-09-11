@@ -101,7 +101,10 @@ public class CheckListAdapter extends BaseExpandableListAdapter {
 		TextView text = (TextView) v.findViewById(R.id.txt_zone_name);
         Switch zoneSwitch = (Switch) v.findViewById(R.id.switch_zone_enabled);
 		text.setText(getGroup(i).toString());
-        zoneSwitch.setChecked(!mServiceManager.isZoneDisabledByApplication(getGroup(i).getId()));
+        String id = getGroup(i).getId();
+        boolean checked = !mServiceManager.isZoneDisabledByApplication(id);
+        zoneSwitch.setOnCheckedChangeListener(null);
+        zoneSwitch.setChecked(checked);
         zoneSwitch.setOnCheckedChangeListener(new ZoneButtonClick(i));
 		return v;
 	}

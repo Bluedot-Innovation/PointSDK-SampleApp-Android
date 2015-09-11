@@ -21,6 +21,7 @@ import com.bluedotinnovation.android.pointapp.R;
 import java.util.ArrayList;
 
 import au.com.bluedot.application.model.geo.Fence;
+import au.com.bluedot.point.net.engine.BeaconInfo;
 import au.com.bluedot.point.net.engine.ZoneInfo;
 
 public class ChecklistFragment extends Fragment {
@@ -98,6 +99,10 @@ public class ChecklistFragment extends Fragment {
                 for (Fence fence : zoneInfo.getFences()) {
                     boolean isCheckedIn = false;
                     mZoneItems.add(new ListItem(fence, isCheckedIn));
+                }
+                for (BeaconInfo beacon : zoneInfo.getBeacons()) {
+                    boolean isCheckedIn = false;
+                    mZoneItems.add(new ListItem(beacon, isCheckedIn));
                 }
                 mListItems.add(mZoneItems);
             }

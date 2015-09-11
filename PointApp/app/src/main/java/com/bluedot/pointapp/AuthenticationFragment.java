@@ -13,9 +13,10 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.CheckBox;
 import android.widget.EditText;
 
-import au.com.bluedot.point.BDError;
+import au.com.bluedot.point.net.engine.BDError;
 import au.com.bluedot.point.ServiceStatusListener;
 
 import au.com.bluedot.point.net.engine.ServiceManager;
@@ -34,6 +35,7 @@ public class AuthenticationFragment extends Fragment implements OnClickListener,
     private EditText mEdtEmail;
     private EditText mEdtApiKey;
     private EditText mEdtPackageName;
+    private CheckBox mRestartMode;
 	private boolean mIsAuthenticated;
 
     // Shared preferences - used to store Bluedot credentials
@@ -51,6 +53,7 @@ public class AuthenticationFragment extends Fragment implements OnClickListener,
 		mEdtApiKey = (EditText) rootView.findViewById(R.id.edt_api_key);
 		mEdtPackageName = (EditText) rootView.findViewById(R.id.edt_package_name);
         mBtnAuthenticate = (Button) rootView .findViewById(R.id.btn_authenticate);
+        mRestartMode = (CheckBox) rootView .findViewById(R.id.chk_box_restart_mode);
         mBtnAuthenticate.setOnClickListener(this);
 
         // get existing credentials from shared preferences
@@ -106,6 +109,10 @@ public class AuthenticationFragment extends Fragment implements OnClickListener,
         ServiceManager.getInstance(getActivity()).addBlueDotPointServiceStatusListener(this);
 		
 		refresh();
+
+        if (ServiceManager.getInstance(getActivity()).isBlueDotPointServiceConfiguredToRestart()){
+            mRestartMode.setChecked(true);
+        }
 	}
 
 	@Override
@@ -159,15 +166,9 @@ public class AuthenticationFragment extends Fragment implements OnClickListener,
 						.setMessage("Please enter login details.")
 						.setPositiveButton("OK", null).create().show();
 			} else {
-                if (mAlternativeUrl == null){
-                    mActivity.startAuthentication(mEdtEmail.getText().toString(),
-                            mEdtApiKey.getText().toString(), mEdtPackageName
-                                    .getText().toString());
-                }else {
-                    mActivity.startAuthenticationWithAlternateUrl(mEdtEmail.getText().toString(),
-                            mEdtApiKey.getText().toString(), mEdtPackageName
-                                    .getText().toString(), mAlternativeUrl);
-                }
+                mActivity.startAuthentication(mEdtEmail.getText().toString(),
+                        mEdtApiKey.getText().toString(), mEdtPackageName
+                                .getText().toString(), mRestartMode.isChecked(), mAlternativeUrl);
                 mIsAuthenticated = true;
             }
 		}
@@ -224,6 +225,19 @@ public class AuthenticationFragment extends Fragment implements OnClickListener,
     @Override
     public void onRuleUpdate(List<ZoneInfo> zoneInfos) {
 
+    }
+
+    @Override
+    public void onBlueDotPointServiceStopWithError(BDError bdError) {
+        if(bdError.isFatal()){
+            mIsAuthenticated = false;
+            getActivity().runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    mBtnAuthenticate.setText(getString(R.string.save_authenticate));
+                }
+            });
+        }
     }
 
 

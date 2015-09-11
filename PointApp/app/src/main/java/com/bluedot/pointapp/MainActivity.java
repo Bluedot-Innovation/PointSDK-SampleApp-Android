@@ -17,8 +17,9 @@ import java.util.List;
 
 import au.com.bluedot.point.ApplicationNotification;
 import au.com.bluedot.point.ApplicationNotificationListener;
-import au.com.bluedot.point.BDError;
+import au.com.bluedot.point.net.engine.BDError;
 import au.com.bluedot.point.ServiceStatusListener;
+import au.com.bluedot.point.net.engine.BeaconInfo;
 import au.com.bluedot.point.net.engine.ZoneInfo;
 import au.com.bluedot.point.net.engine.ServiceManager;
 
@@ -105,8 +106,7 @@ public class MainActivity extends FragmentActivity implements
     }
 
     @Override
-    public void onApplicationNotificationReceived(final
-                                                  ApplicationNotification applicationNotification) {
+    public void onCheckIntoFence(final ApplicationNotification applicationNotification) {
 
         if (applicationNotification != null
                 && applicationNotification.getFence() != null) {
@@ -125,27 +125,41 @@ public class MainActivity extends FragmentActivity implements
 
     }
 
+    @Override
+    public void onCheckIntoBeacon(final ApplicationNotification applicationNotification) {
+
+        if (applicationNotification != null
+                && applicationNotification.getBeaconInfo() != null) {
+            runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    Toast.makeText(
+                            getApplicationContext(),
+                            "Application Notification Received !! You have Entered : "
+                                    + applicationNotification.getBeaconInfo().getName(),
+                            Toast.LENGTH_LONG).show();
+                }
+            });
+        }
+    }
+
 
     public ArrayList<ZoneInfo> getZones() {
         return mServiceManager.getZonesAndFences();
     }
 
     public void startAuthentication(String email, String apiKey,
-                                    String packageName) {
+                                    String packageName, boolean restartMode, String url) {
         mProgress.setMessage(getString(R.string.please_wait_authenticating));
         mProgress.show();
 
-        mServiceManager.sendAuthenticationRequest(packageName, apiKey, email, this);
+        if (url == null){
+            // no alternative url provided
+            mServiceManager.sendAuthenticationRequest(packageName, apiKey, email, this, restartMode);
+        } else {
+            mServiceManager.sendAuthenticationRequest(packageName, apiKey, email, this, restartMode, url);
+        }
     }
-
-    public void startAuthenticationWithAlternateUrl(String email, String apiKey,
-                                    String packageName, String alternateUrl) {
-        mProgress.setMessage(getString(R.string.please_wait_authenticating));
-        mProgress.show();
-
-        mServiceManager.sendAuthenticationRequestWithUrl(packageName, apiKey, email, this, alternateUrl);
-    }
-
 
     public void refreshCurrentFragment(int tabIndex) {
         switch (tabIndex) {
@@ -265,6 +279,19 @@ public class MainActivity extends FragmentActivity implements
                 }
             });
         }
+    }
+
+    @Override
+    public void onBlueDotPointServiceStopWithError(final BDError bdError) {
+        if (mProgress != null && mProgress.isShowing())
+            mProgress.dismiss();
+
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                new Builder(MainActivity.this).setTitle("Error").setMessage(bdError.getReason()).setPositiveButton("OK", null).create().show();
+            }
+        });
     }
 
 }

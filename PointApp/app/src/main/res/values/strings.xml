@@ -23,5 +23,6 @@
     <string name="yes">Yes</string>
     <string name="no">No</string>
     <string name="ok">OK</string>
+    <string name="app_restart">Service auto restart mode</string>
 
 </resources>

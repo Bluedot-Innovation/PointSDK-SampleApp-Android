@@ -82,6 +82,12 @@
             android:singleLine="true"
             android:text="com.au.city" />
 
+        <CheckBox
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/app_restart"
+            android:id="@+id/chk_box_restart_mode"/>
+
         <Button
             android:id="@+id/btn_authenticate"
             android:layout_width="wrap_content"

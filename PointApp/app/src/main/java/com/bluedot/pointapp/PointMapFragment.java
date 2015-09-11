@@ -25,6 +25,7 @@ import au.com.bluedot.model.geo.Circle;
 import au.com.bluedot.model.geo.LineString;
 import au.com.bluedot.model.geo.Point;
 import au.com.bluedot.model.geo.Polygon;
+import au.com.bluedot.point.net.engine.BeaconInfo;
 import au.com.bluedot.point.net.engine.ZoneInfo;
 
 import com.bluedot.pointapp.model.BoundingBoxItem;
@@ -36,6 +37,7 @@ import com.bluedotinnovation.android.pointapp.R;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.CircleOptions;
 import com.google.android.gms.maps.model.LatLng;
@@ -257,17 +259,59 @@ public class PointMapFragment extends SupportMapFragment implements LocationList
         }
     }
 
+    /**
+     * Put beacon on the map
+     * @param beacon
+     * @param zoneInfo
+     */
+    private void displayBeaconOnMap(BeaconInfo beacon, ZoneInfo zoneInfo) {
+        int color = 0x550000aa;
+        MarkerOptions markerOptions = null;
+
+        LatLng latLong = new LatLng(beacon.getLocation().getLatitude(),
+                beacon.getLocation().getLongitude());
+        CircleOptions circleOptions = new CircleOptions().center(latLong)
+                .radius(beacon.getRange()).fillColor(color).strokeWidth(2)
+                .strokeColor(0x88888888);
+
+        CircleItem circleItem = new CircleItem();
+        circleItem.setGeometry(circleOptions);
+        // map.addCircle(circleOptions);
+        markerOptions = new MarkerOptions()
+                .position(new LatLng(beacon.getLocation().getLatitude(),beacon.getLocation().getLongitude()))
+                .title("Zone Name : " + zoneInfo.getZoneName())
+                .snippet("Beacon Name : " + beacon.getName());
+
+        circleItem.setMarkerOption(markerOptions);
+        circleItem.setIcon(BitmapDescriptorFactory.HUE_BLUE);
+
+        clusterManager.addItem(circleItem);
+
+    }
+
 	private void loadDetails(ArrayList<ZoneInfo> zonesInfo) {
 		mMap.clear();
 		clusterManager.clearItems();
-        Log.i(TAG, "Zone size: "+zonesInfo.size());
+        Log.i(TAG, "Zone size: " + zonesInfo.size());
         for (ZoneInfo zoneInfo : zonesInfo) {
-			for (Fence fence : zoneInfo.getFences()) {
-				if (mMap != null) {
-					displayFenceOnMap(fence, zoneInfo);
-				}
-			}
-		}
+            //	printMessage("Zone Name ::: " + zoneInfo.getZoneName());
+            try {
+                if (mMap != null) {
+                    for (Fence fence : zoneInfo.getFences()) {
+                        displayFenceOnMap(fence, zoneInfo);
+                    }
+                    for (BeaconInfo beacon : zoneInfo.getBeacons()) {
+                        displayBeaconOnMap(beacon, zoneInfo);
+                    }
+                }
+            } catch (Exception e) {
+                Log.e(TAG, "loadDetails():");
+                Log.e(TAG, "Zone name:" + zoneInfo.getZoneName());
+                Log.e(TAG, "Fence size: " + zoneInfo.getFences().size());
+                Log.e(TAG, "Beacon size: " + zoneInfo.getBeacons().size());
+                e.printStackTrace();
+            }
+        }
         // Push cluster manager to update map
         clusterManager.cluster();
 	}
@@ -286,9 +330,17 @@ public class PointMapFragment extends SupportMapFragment implements LocationList
 	}
 
 	public LatLng getLastKnownPosition() {
-		LatLng lt = new LatLng(-37.818049, 144.9795319);
-		
-		return lt;
+        LatLng result = null;
+        if (mActivity != null) {
+            LocationManager locationManager = (LocationManager) mActivity.getSystemService(Context.LOCATION_SERVICE);
+            if (locationManager != null) {
+                Location location = locationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
+                if (location != null) {
+                    result = new LatLng(location.getLatitude(), location.getLongitude());
+                }
+            }
+        }
+		return result;
 	}
 
 	public void refresh() {
@@ -392,5 +444,12 @@ public class PointMapFragment extends SupportMapFragment implements LocationList
 			marker.setSnippet(markerOptions.getSnippet());
 			marker.setTitle(markerOptions.getTitle());
 		}
+
+        @Override
+        protected void onBeforeClusterItemRendered(MapItem item, MarkerOptions markerOptions) {
+            if (item.getIcon() != BitmapDescriptorFactory.HUE_RED){
+                markerOptions.icon(BitmapDescriptorFactory.defaultMarker(item.getIcon()));
+            }
+        }
 	}
 }
