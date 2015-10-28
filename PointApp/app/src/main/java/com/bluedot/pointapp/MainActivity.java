@@ -4,6 +4,7 @@ import android.app.AlertDialog;
 import android.app.AlertDialog.Builder;
 import android.app.ProgressDialog;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
@@ -43,6 +44,9 @@ public class MainActivity extends FragmentActivity implements
     private final static int TAB_AUTH = 0;
     private final static int TAB_MAP = 1;
     private final static int TAB_CHECKLIST = 2;
+
+    // storage for credentials update which may happen while app is paused
+    private Bundle scheduledCredentialsUpdate = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -85,6 +89,16 @@ public class MainActivity extends FragmentActivity implements
         mProgress.setCancelable(false);
     }
 
+    @Override
+    protected void onNewIntent (Intent intent){
+        if (intent != null && intent.getData() != null) {
+            // get new credentials from resuming intent
+            scheduledCredentialsUpdate = new Bundle();
+            Uri customURI = intent.getData();
+            scheduledCredentialsUpdate.putString("uri_data", customURI.toString());
+        }
+    }
+
     //stop the Bluedot Point Service
     public void stopService() {
         if (mServiceManager != null) {
@@ -105,7 +119,17 @@ public class MainActivity extends FragmentActivity implements
         mServiceManager.addBlueDotPointServiceStatusListener(this);
         mServiceManager.subscribeForApplicationNotification(this);
         serviceStarted = mServiceManager.isBlueDotPointServiceRunning();
-        refreshCurrentFragment(mTabHost.getCurrentTab());
+        if (scheduledCredentialsUpdate == null) {
+            refreshCurrentFragment(mTabHost.getCurrentTab());
+        } else {
+            mTabHost.setCurrentTab(TAB_AUTH);
+            // pass new credentials to authentication fragment
+            AuthenticationFragment authFragment = (AuthenticationFragment) getSupportFragmentManager().findFragmentByTag(getString(R.string.title_section1));
+            if (authFragment != null) {
+                authFragment.refresh(scheduledCredentialsUpdate);
+            }
+            scheduledCredentialsUpdate = null;
+        }
     }
 
     @Override
@@ -281,7 +305,7 @@ public class MainActivity extends FragmentActivity implements
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                new Builder(MainActivity.this).setTitle("Error").setMessage(bdError.getReason()).setPositiveButton("OK", null).create().show();
+                new Builder(MainActivity.this).setTitle(bdError.isFatal()?"Error":"Notice").setMessage(bdError.getReason()).setPositiveButton("OK", null).create().show();
             }
         });
     }
@@ -306,7 +330,7 @@ public class MainActivity extends FragmentActivity implements
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                new Builder(MainActivity.this).setTitle("Error").setMessage(bdError.getReason()).setPositiveButton("OK", null).create().show();
+                new Builder(MainActivity.this).setTitle(bdError.isFatal()?"Error":"Notice").setMessage(bdError.getReason()).setPositiveButton("OK", null).create().show();
             }
         });
     }

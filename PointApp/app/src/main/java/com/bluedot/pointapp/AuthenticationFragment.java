@@ -153,6 +153,44 @@ public class AuthenticationFragment extends Fragment implements OnClickListener,
         }
 	}
 
+    public void refresh(Bundle newCredentials){
+        refresh();
+        // get credentials from resuming Uri
+        if ( (newCredentials != null && newCredentials.containsKey("uri_data")) ){
+            Uri customURI = Uri.parse(newCredentials.getString("uri_data"));
+            final String uriPackageName = customURI.getQueryParameter("BDPointPackageName");
+            final String uriApiKey = customURI.getQueryParameter("BDPointAPIKey");
+            final String uriEmail = customURI.getQueryParameter("BDPointUsername");
+            mAlternativeUrl = customURI.getQueryParameter("BDPointAPIUrl");
+
+            // Now decide which credentials to put onto UI
+            if (uriApiKey != null && mEdtApiKey.getText().length() == 0){
+                // Put launch Uri credentials
+                mEdtEmail.setText(uriEmail);
+                mEdtApiKey.setText(uriApiKey);
+                mEdtPackageName.setText(uriPackageName);
+            } else if ( ! uriApiKey.equals(mEdtApiKey.getText().toString()) ){
+                // Both credentials present and Uri credentials are different
+                // Ask user if he wants to replace with Uri
+                new AlertDialog.Builder(getActivity())
+                        .setTitle("Different Credentials")
+                        .setCancelable(false)
+                        .setMessage(
+                                "Bluedot Service is already running with ApiKey :"+ mEdtApiKey.getText().toString()
+                                        + "\nDo you want to use new ApiKey : " + uriApiKey + "?")
+                        .setPositiveButton(R.string.yes,
+                                new DialogInterface.OnClickListener() {
+                                    public void onClick(DialogInterface dialog, int which) {
+                                        mEdtEmail.setText(uriEmail);
+                                        mEdtApiKey.setText(uriApiKey);
+                                        mEdtPackageName.setText(uriPackageName);
+                                    }
+                                })
+                        .setNegativeButton(R.string.no, null).create().show();
+            }
+        }
+    }
+
 	@Override
 	public void onClick(View v) {
 		if (mIsAuthenticated) {
