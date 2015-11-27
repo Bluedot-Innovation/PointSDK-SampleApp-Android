@@ -299,7 +299,8 @@ public class MainActivity extends FragmentActivity implements
     //The Bluedot Point Service will stop itself if the error is fatal, then the onBlueDotPointServiceStop() is called 
     @Override
     public void onBlueDotPointServiceError(final BDError bdError) {
-        if (mProgress != null && mProgress.isShowing())
+        // if bdError is not fatal - service is still and authentication in progress. No need to shut mProgress.
+        if (mProgress != null && mProgress.isShowing() && bdError.isFatal())
             mProgress.dismiss();
 
         runOnUiThread(new Runnable() {
@@ -320,19 +321,6 @@ public class MainActivity extends FragmentActivity implements
                 }
             });
         }
-    }
-
-    @Override
-    public void onBlueDotPointServiceStopWithError(final BDError bdError) {
-        if (mProgress != null && mProgress.isShowing())
-            mProgress.dismiss();
-
-        runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                new Builder(MainActivity.this).setTitle(bdError.isFatal()?"Error":"Notice").setMessage(bdError.getReason()).setPositiveButton("OK", null).create().show();
-            }
-        });
     }
 
 }

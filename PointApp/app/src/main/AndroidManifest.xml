@@ -3,8 +3,8 @@
     xmlns:tools="http://schemas.android.com/tools"
     tools:overrideLibrary="au.com.bluedot.point"
     package="com.bluedotinnovation.android.pointapp"
-    android:versionCode="13"
-    android:versionName="1.4.1">
+    android:versionCode="15"
+    android:versionName="1.5">
 
     <uses-sdk
         android:minSdkVersion="14"

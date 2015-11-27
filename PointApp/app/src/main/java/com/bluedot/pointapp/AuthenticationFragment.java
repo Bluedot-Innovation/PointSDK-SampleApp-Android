@@ -266,20 +266,6 @@ public class AuthenticationFragment extends Fragment implements OnClickListener,
     }
 
     @Override
-    public void onBlueDotPointServiceStopWithError(BDError bdError) {
-        if(bdError.isFatal()){
-            mIsAuthenticated = false;
-            getActivity().runOnUiThread(new Runnable() {
-                @Override
-                public void run() {
-                    mBtnAuthenticate.setText(getString(R.string.save_authenticate));
-                }
-            });
-        }
-    }
-
-
-    @Override
     public void onDestroy() {
         super.onDestroy();
         ServiceManager.getInstance(getActivity()).removeBlueDotPointServiceStatusListener(this);
