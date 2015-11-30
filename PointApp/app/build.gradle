@@ -21,7 +21,7 @@ android {
 dependencies {
     compile files('libs/acra-4.5.0.jar')
     compile files('libs/bluedot-point-sdk-release.jar')
-    compile 'com.google.android.gms:play-services-maps:6.+'
+    compile 'com.google.android.gms:play-services-maps:8.3.0'
     compile 'com.android.support:appcompat-v7:21.0.+'
-    compile 'com.google.maps.android:android-maps-utils:0.3+'
+    compile 'com.google.maps.android:android-maps-utils:0.4+'
 }

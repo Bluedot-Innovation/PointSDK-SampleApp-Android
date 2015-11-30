@@ -1,2 +1,10 @@
 # PointSDK-SampleApp-Android-IDEA
-Example of a low battery drain location-aware application, using Bluedot Point SDK on Android
+To use this sample project, you first need to obtain the Point SDK bluedot-point-sdk-release.jar library.
+
+You can obtain the SDK as a zip file by registering for a free account at:
+
+https://www.pointaccess.bluedot.com.au
+
+Download the Android SDK zip file, either when prompted or from Downloads area of your account dashboard. After unzipping the bluedot-point-sdk-release.jar into the PointApp/app/libs/ folder, you will be able to sync / build the project.
+
+More development documentation is available at http://www.bluedotinnovation.com/devresources/pages/
