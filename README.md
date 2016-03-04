@@ -7,4 +7,4 @@ https://www.pointaccess.bluedot.com.au
 
 Download the Android SDK zip file, either when prompted or from Downloads area of your account dashboard. After unzipping the bluedot-point-sdk-release.jar into the PointApp/app/libs/ folder, you will be able to sync / build the project.
 
-More development documentation is available at http://www.bluedotinnovation.com/devresources/pages/
+More developer documentation is available at http://docs.bluedotinnovation.com/
