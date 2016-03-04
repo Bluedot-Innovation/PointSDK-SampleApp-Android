@@ -1,7 +1,5 @@
 # PointSDK-SampleApp-Android-IDEA
-To use this sample project, you first need to obtain the Point SDK bluedot-point-sdk-release.jar library.
-
-You can obtain the SDK as a zip file by registering for a free account at:
+To use this sample project, you first need to obtain the Point SDK as a zip file by registering for a free account at:
 
 https://www.pointaccess.bluedot.com.au
 
