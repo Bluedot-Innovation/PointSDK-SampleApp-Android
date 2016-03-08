@@ -44,11 +44,11 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.PolygonOptions;
+import com.google.android.gms.maps.model.Polyline;
 import com.google.android.gms.maps.model.PolylineOptions;
 import com.google.maps.android.clustering.Cluster;
 import com.google.maps.android.clustering.ClusterManager;
 import com.google.maps.android.clustering.view.DefaultClusterRenderer;
-
 public class PointMapFragment extends SupportMapFragment implements LocationListener, View.OnTouchListener, ClusterManager.OnClusterClickListener, ClusterManager.OnClusterItemClickListener<MapItem>, GoogleMap.OnMapClickListener{
 
     private static final String TAG = PointMapFragment.class.getSimpleName();
@@ -67,6 +67,8 @@ public class PointMapFragment extends SupportMapFragment implements LocationList
 
 	// Last fence drawn by clicking on map marker
 	private Object lastDrawFence;
+	private MapItem lastMapItem;
+
 
 	// Starting from how many of markers organising them into clusters
 	private final static int CLUSTER_MARKERS_IN_CLUSTER = 5;
@@ -114,10 +116,12 @@ public class PointMapFragment extends SupportMapFragment implements LocationList
 		mMap = getMap();
 		if (mMap != null) {
 			mMap.setBuildingsEnabled(true);
-			CameraPosition cameraPosition = CameraPosition.fromLatLngZoom(
-					getLastKnownPosition(), 18);
-			mMap.moveCamera(CameraUpdateFactory
-					.newCameraPosition(cameraPosition));
+			if(getLastKnownPosition()!=null){
+				CameraPosition cameraPosition = CameraPosition.fromLatLngZoom(
+						getLastKnownPosition(), 18);
+				mMap.moveCamera(CameraUpdateFactory
+						.newCameraPosition(cameraPosition));
+			}
 
 			// Initialise cluster manager
 			clusterManager = new ClusterManager<MapItem>(mActivity, mMap);
@@ -366,14 +370,20 @@ public class PointMapFragment extends SupportMapFragment implements LocationList
             }
             lastDrawFence = null;
         }
+
+			lastMapItem = null;
     }
 
 	@Override
 	public boolean onClusterItemClick(MapItem item) {
-
 		deleteLastDrawFence();
+		addFence(item);
+		return false;
+	}
 
-		if(item instanceof CircleItem){
+	private void addFence(MapItem item) {
+		lastMapItem =item;
+		if(item instanceof CircleItem) {
 			com.google.android.gms.maps.model.Circle c = mMap.addCircle((CircleOptions) item.getGeometry());
 			lastDrawFence = c;
 		}else if(item instanceof PolygonItem){
@@ -382,11 +392,10 @@ public class PointMapFragment extends SupportMapFragment implements LocationList
 		}else if(item instanceof BoundingBoxItem){
 			com.google.android.gms.maps.model.Polygon box =  mMap.addPolygon((PolygonOptions) item.getGeometry());
 			lastDrawFence = box;
-        }else if(item instanceof LineStringItem){
-            com.google.android.gms.maps.model.Polyline ls =  mMap.addPolyline((PolylineOptions) item.getGeometry());
-            lastDrawFence = ls;
-        }
-		return false;
+		}else if(item instanceof LineStringItem){
+			Polyline ls =  mMap.addPolyline((PolylineOptions) item.getGeometry());
+			lastDrawFence = ls;
+		}
 	}
 
 	@Override
@@ -434,6 +443,14 @@ public class PointMapFragment extends SupportMapFragment implements LocationList
 		}
 
 		@Override
+		protected void onClusterRendered(Cluster<MapItem> cluster, Marker marker) {
+			super.onClusterRendered(cluster, marker);
+			if(lastMapItem!=null && cluster.getItems().contains(lastMapItem)){
+				deleteLastDrawFence();
+			}
+		}
+
+		@Override
 		protected boolean shouldRenderAsCluster(Cluster<MapItem> cluster) {
 			return cluster.getSize() > CLUSTER_MARKERS_IN_CLUSTER;
 		}
@@ -447,9 +464,12 @@ public class PointMapFragment extends SupportMapFragment implements LocationList
 
         @Override
         protected void onBeforeClusterItemRendered(MapItem item, MarkerOptions markerOptions) {
-            if (item.getIcon() != BitmapDescriptorFactory.HUE_RED){
-                markerOptions.icon(BitmapDescriptorFactory.defaultMarker(item.getIcon()));
-            }
+			if(item.getMarkerOptions().getSnippet().contains("Beacon Name")){
+				markerOptions.icon(BitmapDescriptorFactory.fromResource(R.drawable.marker_beacon));
+			}
+			else{
+				markerOptions.icon(BitmapDescriptorFactory.fromResource(R.drawable.marker_fence));
+			}
         }
 	}
 }

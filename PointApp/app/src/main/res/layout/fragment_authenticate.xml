@@ -38,7 +38,7 @@
             android:layout_width="match_parent"
             android:layout_height="28dp"
             android:gravity="center"
-            android:text="@string/loggned_in_as"
+            android:text="@string/enter_details"
             android:textSize="@dimen/logged_in_as" />
 
         <EditText

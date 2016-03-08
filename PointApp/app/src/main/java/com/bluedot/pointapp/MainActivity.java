@@ -2,9 +2,11 @@ package com.bluedot.pointapp;
 
 import android.app.AlertDialog;
 import android.app.AlertDialog.Builder;
+import android.app.Dialog;
 import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.location.Location;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
@@ -14,12 +16,14 @@ import android.widget.Toast;
 import com.bluedotinnovation.android.pointapp.R;
 import com.google.android.gms.common.GooglePlayServicesNotAvailableException;
 import com.google.android.gms.common.GooglePlayServicesRepairableException;
+import com.google.android.gms.common.GooglePlayServicesUtil;
 import com.google.android.gms.security.ProviderInstaller;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import au.com.bluedot.point.ApplicationNotification;
+import au.com.bluedot.application.model.Proximity;
+import au.com.bluedot.application.model.geo.Fence;
 import au.com.bluedot.point.ApplicationNotificationListener;
 import au.com.bluedot.point.net.engine.BDError;
 import au.com.bluedot.point.ServiceStatusListener;
@@ -40,6 +44,7 @@ public class MainActivity extends FragmentActivity implements
 
     private boolean serviceStarted = false;
 
+    private final int REQUEST_CODE_GOOGLE_PLAY_SERVICES = 5073;
     // TAB indexes
     private final static int TAB_AUTH = 0;
     private final static int TAB_MAP = 1;
@@ -131,45 +136,53 @@ public class MainActivity extends FragmentActivity implements
             scheduledCredentialsUpdate = null;
         }
     }
-
     @Override
-    public void onCheckIntoFence(final ApplicationNotification applicationNotification) {
-
-        if (applicationNotification != null
-                && applicationNotification.getFence() != null) {
-            runOnUiThread(new Runnable() {
-                @Override
-                public void run() {
-                    Toast.makeText(
-                            getApplicationContext(),
-                            "Application Notification Received !! You have Entered : "
-                                    + applicationNotification.getFence().getName(),
-                            Toast.LENGTH_LONG).show();
-                }
-            });
-
-        }
-
+    public void onCheckIntoFence(Fence fence, ZoneInfo zoneInfo, Location location, boolean isCheckOut) {
+        final String fenceName = fence.getName();
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                Toast.makeText(getApplicationContext(), "Entered: " + fenceName, Toast.LENGTH_LONG)
+                        .show();
+            }
+        });
     }
 
     @Override
-    public void onCheckIntoBeacon(final ApplicationNotification applicationNotification) {
-
-        if (applicationNotification != null
-                && applicationNotification.getBeaconInfo() != null) {
-            runOnUiThread(new Runnable() {
-                @Override
-                public void run() {
-                    Toast.makeText(
-                            getApplicationContext(),
-                            "Application Notification Received !! You have Entered : "
-                                    + applicationNotification.getBeaconInfo().getName(),
-                            Toast.LENGTH_LONG).show();
-                }
-            });
-        }
+    public void onCheckedOutFromFence(Fence fence, ZoneInfo zoneInfo, final int dwellTime) {
+        final String fenceName = fence.getName();
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                Toast.makeText(getApplicationContext(), "Left: " + fenceName + " dwellTime,min=" + dwellTime, Toast.LENGTH_LONG)
+                        .show();
+            }
+        });
     }
 
+    @Override
+    public void onCheckIntoBeacon(BeaconInfo beaconInfo, ZoneInfo zoneInfo, Location location, Proximity proximity, boolean isCheckOut) {
+        final String beaconName = beaconInfo.getName();
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                Toast.makeText(getApplicationContext(), "Entered: " + beaconName, Toast.LENGTH_LONG)
+                        .show();
+            }
+        });
+    }
+
+    @Override
+    public void onCheckedOutFromBeacon(BeaconInfo beaconInfo, ZoneInfo zoneInfo, final int dwellTime) {
+        final String beaconName = beaconInfo.getName();
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                Toast.makeText(getApplicationContext(), "Left: " + beaconName + " dwellTime,min=" + dwellTime, Toast.LENGTH_LONG)
+                        .show();
+            }
+        });
+    }
 
     public ArrayList<ZoneInfo> getZones() {
         return mServiceManager.getZonesAndFences();
@@ -185,6 +198,11 @@ public class MainActivity extends FragmentActivity implements
             ProviderInstaller.installIfNeeded(getApplicationContext());
         } catch (GooglePlayServicesRepairableException e) {
             Toast.makeText(this, "GooglePlayServicesRepairableException happened while updating Security Provider", Toast.LENGTH_LONG).show();
+            Dialog dialog = GooglePlayServicesUtil.getErrorDialog(
+                    e.getConnectionStatusCode(),
+                    this,
+                    REQUEST_CODE_GOOGLE_PLAY_SERVICES);
+            dialog.show();
             return;
         } catch (GooglePlayServicesNotAvailableException e) {
             Toast.makeText(this, "GooglePlayServicesNotAvailableException happened while updating Security Provider", Toast.LENGTH_LONG).show();
@@ -281,7 +299,7 @@ public class MainActivity extends FragmentActivity implements
 
         serviceStarted = true;
 
-        refreshCurrentFragment(mTabHost.getCurrentTab());
+        mTabHost.setCurrentTab(TAB_MAP);
     }
 
     //This is called when Bluedot Point Service stopped. Your app could clear and release resources 

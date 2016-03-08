@@ -24,5 +24,6 @@
     <string name="no">No</string>
     <string name="ok">OK</string>
     <string name="app_restart">Service auto restart mode</string>
+    <string name="enter_details">Enter your account details</string>
 
 </resources>

@@ -15,6 +15,7 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.EditText;
+import android.widget.TextView;
 
 import au.com.bluedot.point.net.engine.BDError;
 import au.com.bluedot.point.ServiceStatusListener;
@@ -36,6 +37,7 @@ public class AuthenticationFragment extends Fragment implements OnClickListener,
     private EditText mEdtApiKey;
     private EditText mEdtPackageName;
     private CheckBox mRestartMode;
+    private TextView mTxtTitle;
 	private boolean mIsAuthenticated;
 
     // Shared preferences - used to store Bluedot credentials
@@ -54,6 +56,7 @@ public class AuthenticationFragment extends Fragment implements OnClickListener,
 		mEdtPackageName = (EditText) rootView.findViewById(R.id.edt_package_name);
         mBtnAuthenticate = (Button) rootView .findViewById(R.id.btn_authenticate);
         mRestartMode = (CheckBox) rootView .findViewById(R.id.chk_box_restart_mode);
+        mTxtTitle = (TextView) rootView .findViewById(R.id.txt_title);
         mBtnAuthenticate.setOnClickListener(this);
 
         // get existing credentials from shared preferences
@@ -141,6 +144,7 @@ public class AuthenticationFragment extends Fragment implements OnClickListener,
                 @Override
                 public void run() {
                     mBtnAuthenticate.setText(getString(R.string.clear_logout));
+                    mTxtTitle.setText(getString(R.string.loggned_in_as));
                 }
             });
         }else{
@@ -148,6 +152,7 @@ public class AuthenticationFragment extends Fragment implements OnClickListener,
                 @Override
                 public void run() {
                     mBtnAuthenticate.setText(getString(R.string.save_authenticate));
+                    mTxtTitle.setText(getString(R.string.enter_details));
                 }
             });
         }
@@ -230,6 +235,7 @@ public class AuthenticationFragment extends Fragment implements OnClickListener,
             @Override
             public void run() {
                 mBtnAuthenticate.setText(getString(R.string.clear_logout));
+                mTxtTitle.setText(getString(R.string.loggned_in_as));
             }
         });
 
@@ -242,6 +248,7 @@ public class AuthenticationFragment extends Fragment implements OnClickListener,
             @Override
             public void run() {
                 mBtnAuthenticate.setText(getString(R.string.save_authenticate));
+                mTxtTitle.setText(getString(R.string.enter_details));
             }
         });
     }
@@ -255,6 +262,7 @@ public class AuthenticationFragment extends Fragment implements OnClickListener,
                 @Override
                 public void run() {
                     mBtnAuthenticate.setText(getString(R.string.save_authenticate));
+                    mTxtTitle.setText(getString(R.string.enter_details));
                 }
             });
         }
