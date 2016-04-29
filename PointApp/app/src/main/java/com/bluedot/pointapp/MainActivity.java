@@ -2,7 +2,6 @@ package com.bluedot.pointapp;
 
 import android.app.AlertDialog;
 import android.app.AlertDialog.Builder;
-import android.app.Dialog;
 import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -14,10 +13,6 @@ import android.support.v4.app.FragmentTabHost;
 import android.widget.Toast;
 
 import com.bluedotinnovation.android.pointapp.R;
-import com.google.android.gms.common.GooglePlayServicesNotAvailableException;
-import com.google.android.gms.common.GooglePlayServicesRepairableException;
-import com.google.android.gms.common.GooglePlayServicesUtil;
-import com.google.android.gms.security.ProviderInstaller;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -44,7 +39,6 @@ public class MainActivity extends FragmentActivity implements
 
     private boolean serviceStarted = false;
 
-    private final int REQUEST_CODE_GOOGLE_PLAY_SERVICES = 5073;
     // TAB indexes
     private final static int TAB_AUTH = 0;
     private final static int TAB_MAP = 1;
@@ -190,25 +184,6 @@ public class MainActivity extends FragmentActivity implements
 
     public void startAuthentication(String email, String apiKey,
                                     String packageName, boolean restartMode, String url) {
-        // Update security policies
-        // Androids below 5.0 do not support TLSv1.2 naturally
-        // and must go thru Security Provider update process
-        // https://developer.android.com/training/articles/security-gms-provider.html
-        try {
-            ProviderInstaller.installIfNeeded(getApplicationContext());
-        } catch (GooglePlayServicesRepairableException e) {
-            Toast.makeText(this, "GooglePlayServicesRepairableException happened while updating Security Provider", Toast.LENGTH_LONG).show();
-            Dialog dialog = GooglePlayServicesUtil.getErrorDialog(
-                    e.getConnectionStatusCode(),
-                    this,
-                    REQUEST_CODE_GOOGLE_PLAY_SERVICES);
-            dialog.show();
-            return;
-        } catch (GooglePlayServicesNotAvailableException e) {
-            Toast.makeText(this, "GooglePlayServicesNotAvailableException happened while updating Security Provider", Toast.LENGTH_LONG).show();
-            return;
-        }
-
         mProgress.setMessage(getString(R.string.please_wait_authenticating));
         mProgress.show();
 
