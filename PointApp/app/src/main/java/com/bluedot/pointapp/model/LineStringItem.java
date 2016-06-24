@@ -3,10 +3,10 @@ package com.bluedot.pointapp.model;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.PolylineOptions;
 
-/**
- * Created by alexeyazarov on 24/04/15.
+/*
+ * @author Bluedot Innovation
+ * Copyright (c) 2016 Bluedot Innovation. All rights reserved.
  */
-
 public class LineStringItem extends MapItem{
 
 	private PolylineOptions polygon;

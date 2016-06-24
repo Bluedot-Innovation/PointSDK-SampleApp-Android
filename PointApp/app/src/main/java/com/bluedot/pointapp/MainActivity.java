@@ -26,6 +26,10 @@ import au.com.bluedot.point.net.engine.BeaconInfo;
 import au.com.bluedot.point.net.engine.ZoneInfo;
 import au.com.bluedot.point.net.engine.ServiceManager;
 
+/*
+ * @author Bluedot Innovation
+ * Copyright (c) 2016 Bluedot Innovation. All rights reserved.
+ */
 public class MainActivity extends FragmentActivity implements
         ServiceStatusListener,
         ApplicationNotificationListener {
@@ -77,11 +81,11 @@ public class MainActivity extends FragmentActivity implements
 
         //Get an instance of ServiceManager
         mServiceManager = ServiceManager.getInstance(this);
-       
+
         //Setup the notification icon to display when a notification action is triggered
         mServiceManager.setNotificationIDResourceID(R.drawable.ic_launcher);
-        
-        //Setup the notification activity to start when a fired notification is clicked 
+
+        //Setup the notification activity to start when a fired notification is clicked
         mServiceManager.setCustomMessageAction(MainActivity.class);
 
         mProgress = new ProgressDialog(this);
@@ -277,7 +281,7 @@ public class MainActivity extends FragmentActivity implements
         mTabHost.setCurrentTab(TAB_MAP);
     }
 
-    //This is called when Bluedot Point Service stopped. Your app could clear and release resources 
+    //This is called when Bluedot Point Service stopped. Your app could clear and release resources
     @Override
     public void onBlueDotPointServiceStop() {
         if (mProgress != null && mProgress.isShowing())
@@ -288,8 +292,8 @@ public class MainActivity extends FragmentActivity implements
         refreshCurrentFragment(mTabHost.getCurrentTab());
     }
 
-    //This is invoked when Bluedot Point Service got error. You can call isFatal() method to check if the error is fatal. 
-    //The Bluedot Point Service will stop itself if the error is fatal, then the onBlueDotPointServiceStop() is called 
+    //This is invoked when Bluedot Point Service got error. You can call isFatal() method to check if the error is fatal.
+    //The Bluedot Point Service will stop itself if the error is fatal, then the onBlueDotPointServiceStop() is called
     @Override
     public void onBlueDotPointServiceError(final BDError bdError) {
         // if bdError is not fatal - service is still and authentication in progress. No need to shut mProgress.

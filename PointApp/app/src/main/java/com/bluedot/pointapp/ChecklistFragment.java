@@ -24,6 +24,10 @@ import au.com.bluedot.application.model.geo.Fence;
 import au.com.bluedot.point.net.engine.BeaconInfo;
 import au.com.bluedot.point.net.engine.ZoneInfo;
 
+/*
+ * @author Bluedot Innovation
+ * Copyright (c) 2016 Bluedot Innovation. All rights reserved.
+ */
 public class ChecklistFragment extends Fragment {
 
     private ExpandableListView mListView;

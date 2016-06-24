@@ -8,6 +8,10 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 
+/*
+ * @author Bluedot Innovation
+ * Copyright (c) 2016 Bluedot Innovation. All rights reserved.
+ */
 public class CustomArrayAdapter extends ArrayAdapter<Item> {
 
 	private LayoutInflater mInflater;

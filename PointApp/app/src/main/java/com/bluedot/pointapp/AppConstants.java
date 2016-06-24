@@ -1,7 +1,8 @@
 package com.bluedot.pointapp;
 
-/**
- * Created by jack on 28/01/15.
+/*
+ * @author Bluedot Innovation
+ * Copyright (c) 2016 Bluedot Innovation. All rights reserved.
  */
 public class AppConstants {
 

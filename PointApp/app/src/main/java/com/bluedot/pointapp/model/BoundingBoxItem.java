@@ -4,8 +4,9 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.PolygonOptions;
 import com.google.maps.android.clustering.ClusterItem;
 
-/**
- * Created by Jichen on 1/04/15.
+/*
+ * @author Bluedot Innovation
+ * Copyright (c) 2016 Bluedot Innovation. All rights reserved.
  */
 public class BoundingBoxItem extends MapItem{
 

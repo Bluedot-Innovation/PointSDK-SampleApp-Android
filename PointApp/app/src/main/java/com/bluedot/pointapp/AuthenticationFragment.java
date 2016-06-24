@@ -27,6 +27,10 @@ import com.bluedotinnovation.android.pointapp.R;
 
 import java.util.List;
 
+/*
+ * @author Bluedot Innovation
+ * Copyright (c) 2016 Bluedot Innovation. All rights reserved.
+ */
 public class AuthenticationFragment extends Fragment implements OnClickListener, ServiceStatusListener{
 
     // Context Activity and UI elements members
@@ -110,7 +114,7 @@ public class AuthenticationFragment extends Fragment implements OnClickListener,
         super.onViewCreated(view, savedInstanceState);
 
         ServiceManager.getInstance(getActivity()).addBlueDotPointServiceStatusListener(this);
-		
+
 		refresh();
 
         if (ServiceManager.getInstance(getActivity()).isBlueDotPointServiceConfiguredToRestart()){

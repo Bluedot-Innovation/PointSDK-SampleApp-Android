@@ -49,9 +49,14 @@ import com.google.android.gms.maps.model.PolylineOptions;
 import com.google.maps.android.clustering.Cluster;
 import com.google.maps.android.clustering.ClusterManager;
 import com.google.maps.android.clustering.view.DefaultClusterRenderer;
+
+/*
+ * @author Bluedot Innovation
+ * Copyright (c) 2016 Bluedot Innovation. All rights reserved.
+ */
 public class PointMapFragment extends SupportMapFragment implements LocationListener, View.OnTouchListener, ClusterManager.OnClusterClickListener, ClusterManager.OnClusterItemClickListener<MapItem>, GoogleMap.OnMapClickListener{
 
-    private static final String TAG = PointMapFragment.class.getSimpleName();
+  private static final String TAG = PointMapFragment.class.getSimpleName();
 	private GoogleMap mMap;
 	private MainActivity mActivity;
 	private static boolean mIsInBackbround = true;

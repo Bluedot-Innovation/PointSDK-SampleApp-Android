@@ -3,6 +3,10 @@ package com.bluedot.pointapp.list;
 import au.com.bluedot.application.model.geo.Fence;
 import au.com.bluedot.point.net.engine.BeaconInfo;
 
+/*
+ * @author Bluedot Innovation
+ * Copyright (c) 2016 Bluedot Innovation. All rights reserved.
+ */
 public class ListItem {
 	private Fence mFence;
     private BeaconInfo mBeacon;

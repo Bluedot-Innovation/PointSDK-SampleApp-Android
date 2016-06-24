@@ -1,5 +1,9 @@
 package com.bluedot.pointapp.list;
 
+/*
+ * @author Bluedot Innovation
+ * Copyright (c) 2016 Bluedot Innovation. All rights reserved.
+ */
 public class HeaderItem {
 
 	private String name = "";
