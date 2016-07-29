@@ -10,12 +10,12 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentTabHost;
-import android.widget.Toast;
 
 import com.bluedotinnovation.android.pointapp.R;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import au.com.bluedot.application.model.Proximity;
 import au.com.bluedot.application.model.geo.Fence;
@@ -105,7 +105,7 @@ public class MainActivity extends FragmentActivity implements
     //stop the Bluedot Point Service
     public void stopService() {
         if (mServiceManager != null) {
-        	//Call the method stopPointService in ServiceManager to stop Bluedot PointService
+            //Call the method stopPointService in ServiceManager to stop Bluedot PointService
             mServiceManager.stopPointService();
             if (mTabHost != null) {
                 refreshCurrentFragment(mTabHost.getCurrentTab());
@@ -135,51 +135,77 @@ public class MainActivity extends FragmentActivity implements
         }
     }
     @Override
-    public void onCheckIntoFence(Fence fence, ZoneInfo zoneInfo, Location location, boolean isCheckOut) {
-        final String fenceName = fence.getName();
-        runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                Toast.makeText(getApplicationContext(), "Entered: " + fenceName, Toast.LENGTH_LONG)
-                        .show();
-            }
-        });
+    public void onCheckIntoFence(Fence fence, ZoneInfo zoneInfo, Location location, Map<String, String> customData, boolean isCheckOut) {
+        String messageText = "";
+//        uncomment to display custom data
+//        if (customData!=null && !(customData.isEmpty())) {
+//            for (Map.Entry<String, String> entry : customData.entrySet()) {
+//                messageText += entry.getKey() + ": " + entry.getValue() + "\n";
+//            }
+//        }
+        String messageTitle = "CheckIn " + zoneInfo.getZoneName();
+        fireDialog(messageTitle, messageText);
     }
 
     @Override
-    public void onCheckedOutFromFence(Fence fence, ZoneInfo zoneInfo, final int dwellTime) {
-        final String fenceName = fence.getName();
-        runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                Toast.makeText(getApplicationContext(), "Left: " + fenceName + " dwellTime,min=" + dwellTime, Toast.LENGTH_LONG)
-                        .show();
-            }
-        });
+    public void onCheckedOutFromFence(Fence fence, ZoneInfo zoneInfo, int dwellTime, Map<String, String> customData) {
+        String messageText = "dwellTime,min=" + dwellTime + "\n";
+//        uncomment to display custom data
+//        if (customData!=null && !(customData.isEmpty())) {
+//            for (Map.Entry<String, String> entry : customData.entrySet()) {
+//                messageText += entry.getKey() + ": " + entry.getValue() + "\n";
+//            }
+//        }
+        String messageTitle = "CheckOut " + zoneInfo.getZoneName();
+        fireDialog(messageTitle, messageText);
     }
 
     @Override
-    public void onCheckIntoBeacon(BeaconInfo beaconInfo, ZoneInfo zoneInfo, Location location, Proximity proximity, boolean isCheckOut) {
-        final String beaconName = beaconInfo.getName();
-        runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                Toast.makeText(getApplicationContext(), "Entered: " + beaconName, Toast.LENGTH_LONG)
-                        .show();
-            }
-        });
+    public void onCheckIntoBeacon(BeaconInfo beaconInfo, ZoneInfo zoneInfo, Location location, Proximity proximity, Map<String, String> customData, boolean isCheckOut) {
+        String messageText = "";
+//        uncomment to display custom data
+//        if (customData!=null && !(customData.isEmpty())) {
+//            for (Map.Entry<String, String> entry : customData.entrySet()) {
+//                messageText += entry.getKey() + ": " + entry.getValue() + "\n";
+//            }
+//        }
+        String messageTitle = "CheckIn " + zoneInfo.getZoneName();
+        fireDialog(messageTitle, messageText);
     }
 
     @Override
-    public void onCheckedOutFromBeacon(BeaconInfo beaconInfo, ZoneInfo zoneInfo, final int dwellTime) {
-        final String beaconName = beaconInfo.getName();
-        runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                Toast.makeText(getApplicationContext(), "Left: " + beaconName + " dwellTime,min=" + dwellTime, Toast.LENGTH_LONG)
-                        .show();
-            }
-        });
+    public void onCheckedOutFromBeacon(BeaconInfo beaconInfo, ZoneInfo zoneInfo, int dwellTime, Map<String, String> customData) {
+        String messageText = "dwellTime,min=" + dwellTime + "\n";
+//        uncomment to display custom data
+//        if (customData!=null && !(customData.isEmpty())) {
+//            for (Map.Entry<String, String> entry : customData.entrySet()) {
+//                messageText += entry.getKey() + ": " + entry.getValue() + "\n";
+//            }
+//        }
+        String messageTitle = "CheckOut " + zoneInfo.getZoneName();
+        fireDialog(messageTitle, messageText);
+    }
+
+    private void fireDialog(final String title, final String message){
+        try {
+            runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    AlertDialog alertDialog = new AlertDialog.Builder(MainActivity.this).create();
+                    alertDialog.setTitle(title);
+                    alertDialog.setMessage(message);
+                    alertDialog.setButton(AlertDialog.BUTTON_NEUTRAL, "OK",
+                            new DialogInterface.OnClickListener() {
+                                public void onClick(DialogInterface dialog, int which) {
+                                    dialog.dismiss();
+                                }
+                            });
+                    alertDialog.show();
+                }
+            });
+        } catch (Exception e) {
+
+        }
     }
 
     public ArrayList<ZoneInfo> getZones() {
@@ -201,13 +227,6 @@ public class MainActivity extends FragmentActivity implements
 
     public void refreshCurrentFragment(int tabIndex) {
         switch (tabIndex) {
-//            case TAB_AUTH:
-//                AuthenticationFragment authFragment = (AuthenticationFragment) getSupportFragmentManager()
-//                        .findFragmentByTag(mTabHost.getCurrentTabTag());
-//                if (authFragment != null) {
-//                    authFragment.refresh();
-//                }
-//                break;
             case TAB_MAP:
                 PointMapFragment pointMapFragment = (PointMapFragment) getSupportFragmentManager()
                         .findFragmentByTag(mTabHost.getCurrentTabTag());

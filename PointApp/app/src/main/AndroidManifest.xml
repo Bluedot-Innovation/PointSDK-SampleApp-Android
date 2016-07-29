@@ -3,8 +3,8 @@
     xmlns:tools="http://schemas.android.com/tools"
     tools:overrideLibrary="au.com.bluedot.point"
     package="com.bluedotinnovation.android.pointapp"
-    android:versionCode="21"
-    android:versionName="1.7.1">
+    android:versionCode="24"
+    android:versionName="1.8">
 
     <uses-sdk
         android:minSdkVersion="14"
@@ -73,6 +73,9 @@
         <service android:name="au.com.bluedot.point.beacon.BlueDotBLEService" android:exported="false"/>
 
         <service android:name="au.com.bluedot.point.net.engine.BlueDotPointService" android:exported="false"/>
+
+        <service android:name="au.com.bluedot.point.net.engine.DataJobScheduler" android:exported="false"
+            android:permission="android.permission.BIND_JOB_SERVICE" />
 
     </application>
 
