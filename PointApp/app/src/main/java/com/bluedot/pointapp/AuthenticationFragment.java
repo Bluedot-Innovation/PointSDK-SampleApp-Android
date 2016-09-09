@@ -1,11 +1,18 @@
 package com.bluedot.pointapp;
 
+import android.Manifest;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
+import android.provider.Settings;
+import android.support.annotation.NonNull;
+import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
@@ -33,6 +40,7 @@ import java.util.List;
  */
 public class AuthenticationFragment extends Fragment implements OnClickListener, ServiceStatusListener{
 
+    private static final int PERMISSION_REQUEST_CODE = 101;
     // Context Activity and UI elements members
 	private MainActivity mActivity;
 	private Button mBtnAuthenticate;
@@ -114,7 +122,7 @@ public class AuthenticationFragment extends Fragment implements OnClickListener,
         super.onViewCreated(view, savedInstanceState);
 
         ServiceManager.getInstance(getActivity()).addBlueDotPointServiceStatusListener(this);
-
+		
 		refresh();
 
         if (ServiceManager.getInstance(getActivity()).isBlueDotPointServiceConfiguredToRestart()){
@@ -213,15 +221,19 @@ public class AuthenticationFragment extends Fragment implements OnClickListener,
 						.setMessage("Please enter login details.")
 						.setPositiveButton("OK", null).create().show();
 			} else {
-                mActivity.startAuthentication(mEdtEmail.getText().toString(),
-                        mEdtApiKey.getText().toString(), mEdtPackageName
-                                .getText().toString(), mRestartMode.isChecked(), mAlternativeUrl);
-                mIsAuthenticated = true;
+                if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M || (checkPermission() && Build.VERSION.SDK_INT > Build.VERSION_CODES.LOLLIPOP)) {
+                    mActivity.startAuthentication(mEdtEmail.getText().toString(),
+                            mEdtApiKey.getText().toString(), mEdtPackageName
+                                    .getText().toString(), mRestartMode.isChecked(), mAlternativeUrl);
+                    mIsAuthenticated = true;
+                } else {
+                    requestLocationPermission();
+                }
             }
 		}
 	}
 
-	//Update the button status when the Bluedot Point Service status callback is invoked
+    //Update the button status when the Bluedot Point Service status callback is invoked
     @Override
     public void onBlueDotPointServiceStartedSuccess() {
         mIsAuthenticated = true;
@@ -281,5 +293,74 @@ public class AuthenticationFragment extends Fragment implements OnClickListener,
     public void onDestroy() {
         super.onDestroy();
         ServiceManager.getInstance(getActivity()).removeBlueDotPointServiceStatusListener(this);
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+
+        switch (requestCode) {
+            case PERMISSION_REQUEST_CODE:
+
+                boolean permissionGranted = true;
+                for(Integer i : grantResults) {
+                    permissionGranted = permissionGranted && (i == PackageManager.PERMISSION_GRANTED);
+                }
+
+                if(permissionGranted) {
+                    mActivity.startAuthentication(mEdtEmail.getText().toString(),
+                            mEdtApiKey.getText().toString(), mEdtPackageName
+                                    .getText().toString(), mRestartMode.isChecked(), mAlternativeUrl);
+                    mIsAuthenticated = true;
+                } else {
+
+                    if (shouldShowRequestPermissionRationale(Manifest.permission.ACCESS_FINE_LOCATION) || shouldShowRequestPermissionRationale(Manifest.permission.ACCESS_COARSE_LOCATION) ) {
+
+                        AlertDialog alertDialog = new AlertDialog.Builder(getActivity()).create();
+                        alertDialog.setTitle("Information");
+                        alertDialog.setMessage(getResources().getString(R.string.permission_needed));
+                        alertDialog.setButton(AlertDialog.BUTTON_NEUTRAL, "OK",
+                                new DialogInterface.OnClickListener() {
+                                    public void onClick(DialogInterface dialog, int which) {
+                                       dialog.dismiss();
+                                    }
+                                });
+                        alertDialog.show();
+                    } else {
+                        AlertDialog alertDialog = new AlertDialog.Builder(getActivity()).create();
+                        alertDialog.setTitle("Information");
+                        alertDialog.setMessage(getResources().getString(R.string.location_permissions_mandatory));
+                        alertDialog.setButton(AlertDialog.BUTTON_NEUTRAL, "OK",
+                                new DialogInterface.OnClickListener() {
+                                    public void onClick(DialogInterface dialog, int which) {
+                                        Intent intent = new Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS);
+                                        Uri uri = Uri.fromParts("package", getActivity().getPackageName(), null);
+                                        intent.setData(uri);
+                                        startActivityForResult(intent, PERMISSION_REQUEST_CODE);
+                                    }
+                                });
+                        alertDialog.show();
+                    }
+
+
+                }
+        }
+    }
+
+    /**
+     * Checks for status of required Location permission
+     * @return - status of required permission
+     */
+    private boolean checkPermission() {
+        int status_fine = ActivityCompat.checkSelfPermission(getActivity(), Manifest.permission.ACCESS_FINE_LOCATION);
+        int status_coarse = ActivityCompat.checkSelfPermission(getActivity(), Manifest.permission.ACCESS_COARSE_LOCATION);
+        return (status_fine == PackageManager.PERMISSION_GRANTED) && (status_coarse == PackageManager.PERMISSION_GRANTED);
+    }
+
+    /**
+     * Displays user dialog for runtime permission request
+     */
+    private void requestLocationPermission() {
+        requestPermissions(new String[]{Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION}, PERMISSION_REQUEST_CODE);
     }
 }

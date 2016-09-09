@@ -1,13 +1,13 @@
 apply plugin: 'com.android.application'
 
 android {
-    compileSdkVersion 'Google Inc.:Google APIs:21'
-    buildToolsVersion "21.1.2"
+    compileSdkVersion 'Google Inc.:Google APIs:23'
+    buildToolsVersion "23.0.2"
 
     defaultConfig {
         applicationId "com.bluedotinnovation.android.pointapp"
         minSdkVersion 14
-        targetSdkVersion 21
+        targetSdkVersion 23
     }
 
     buildTypes {
@@ -21,6 +21,6 @@ android {
 dependencies {
     compile files('libs/bluedot-point-sdk-release.jar')
     compile 'com.google.android.gms:play-services-maps:8.3.0'
-    compile 'com.android.support:appcompat-v7:21.0.+'
-    compile 'com.google.maps.android:android-maps-utils:0.4+'
+    compile 'com.android.support:appcompat-v7:23.0.1'
+    compile 'com.google.maps.android:android-maps-utils:0.4.3'
 }

@@ -25,5 +25,8 @@
     <string name="ok">OK</string>
     <string name="app_restart">Service auto restart mode</string>
     <string name="enter_details">Enter your account details</string>
+    <string name="empty_ruleset">No data available on the backend. To start testing, please create at least one zone with a fence and an action to trigger when the device enters the location on the backend using our friendly <![CDATA[<a href="https://www.pointaccess.bluedot.com.au/pointaccess-v1/login.html">dashboard</a>]]>.</string>
+    <string name="location_permissions_mandatory">Location permission has not been granted, App will be redirected to the Application Settings page from where you can grant the Location permission</string>
+    <string name="permission_needed">Bluedot Point SDK requires Location Services to start. Therefore granting the Location permission is mandatory, without that the SDK will not authenticate.</string>
 
 </resources>

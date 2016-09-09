@@ -3,14 +3,17 @@ package com.bluedot.pointapp;
 import java.util.ArrayList;
 import java.util.List;
 
+import android.Manifest;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.pm.PackageManager;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.Bundle;
+import android.support.v4.app.ActivityCompat;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
@@ -56,7 +59,7 @@ import com.google.maps.android.clustering.view.DefaultClusterRenderer;
  */
 public class PointMapFragment extends SupportMapFragment implements LocationListener, View.OnTouchListener, ClusterManager.OnClusterClickListener, ClusterManager.OnClusterItemClickListener<MapItem>, GoogleMap.OnMapClickListener{
 
-  private static final String TAG = PointMapFragment.class.getSimpleName();
+    private static final String TAG = PointMapFragment.class.getSimpleName();
 	private GoogleMap mMap;
 	private MainActivity mActivity;
 	private static boolean mIsInBackbround = true;
@@ -150,7 +153,9 @@ public class PointMapFragment extends SupportMapFragment implements LocationList
 		{
 			case MotionEvent.ACTION_DOWN:
 				mMap.setMyLocationEnabled(true);
-				mLocationManager.requestSingleUpdate(LocationManager.PASSIVE_PROVIDER, this, null);
+				if(checkPermission()) {
+					mLocationManager.requestSingleUpdate(LocationManager.PASSIVE_PROVIDER, this, null);
+				}
 				break;
 			case MotionEvent.ACTION_UP:
 				mMap.setMyLocationEnabled(false);
@@ -343,11 +348,13 @@ public class PointMapFragment extends SupportMapFragment implements LocationList
         if (mActivity != null) {
             LocationManager locationManager = (LocationManager) mActivity.getSystemService(Context.LOCATION_SERVICE);
             if (locationManager != null) {
-                Location location = locationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
-                if (location != null) {
-                    result = new LatLng(location.getLatitude(), location.getLongitude());
-                }
-            }
+				if (checkPermission()) {
+					Location location = locationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
+					if (location != null) {
+                        result = new LatLng(location.getLatitude(), location.getLongitude());
+                    }
+				}
+			}
         }
 		return result;
 	}
@@ -419,7 +426,9 @@ public class PointMapFragment extends SupportMapFragment implements LocationList
 			}
 		}
 		if (requestAnotherUpdate){
-			mLocationManager.requestSingleUpdate(LocationManager.PASSIVE_PROVIDER, this, null);
+			if(checkPermission()) {
+				mLocationManager.requestSingleUpdate(LocationManager.PASSIVE_PROVIDER, this, null);
+			}
 		}
 	}
 
@@ -476,5 +485,15 @@ public class PointMapFragment extends SupportMapFragment implements LocationList
 				markerOptions.icon(BitmapDescriptorFactory.fromResource(R.drawable.marker_fence));
 			}
         }
+	}
+
+	/**
+	 * Checks for status of required Location permission
+	 * @return - status of required permission
+	 */
+	private boolean checkPermission() {
+		int status_fine = ActivityCompat.checkSelfPermission(getActivity(), Manifest.permission.ACCESS_FINE_LOCATION);
+		int status_coarse = ActivityCompat.checkSelfPermission(getActivity(), Manifest.permission.ACCESS_COARSE_LOCATION);
+		return (status_fine == PackageManager.PERMISSION_GRANTED) && (status_coarse == PackageManager.PERMISSION_GRANTED);
 	}
 }
