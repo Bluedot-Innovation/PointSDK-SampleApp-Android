@@ -77,6 +77,7 @@ public class AuthenticationFragment extends Fragment implements OnClickListener,
             mEdtEmail.setText(mSharedPreferences.getString(AppConstants.KEY_USERNAME, null));
             mEdtApiKey.setText(mSharedPreferences.getString(AppConstants.KEY_API_KEY, null));
             mEdtPackageName.setText(mSharedPreferences.getString(AppConstants.KEY_PACKAGE_NAME, null));
+            mAlternativeUrl = mSharedPreferences.getString(AppConstants.KEY_URL, null);
         }
 
         // get credentials from lanching Uri
@@ -85,7 +86,7 @@ public class AuthenticationFragment extends Fragment implements OnClickListener,
             final String uriPackageName = customURI.getQueryParameter("BDPointPackageName");
             final String uriApiKey = customURI.getQueryParameter("BDPointAPIKey");
             final String uriEmail = customURI.getQueryParameter("BDPointUsername");
-            mAlternativeUrl = customURI.getQueryParameter("BDPointAPIUrl");
+            final String uriAlternativeUrl = customURI.getQueryParameter("BDPointAPIUrl");
 
             // Now decide which credentials to put onto UI
             if (uriApiKey != null && mEdtApiKey.getText().length() == 0){
@@ -93,6 +94,9 @@ public class AuthenticationFragment extends Fragment implements OnClickListener,
                 mEdtEmail.setText(uriEmail);
                 mEdtApiKey.setText(uriApiKey);
                 mEdtPackageName.setText(uriPackageName);
+                if(uriAlternativeUrl != null) {
+                    mAlternativeUrl = uriAlternativeUrl;
+                }
             } else if ( ! uriApiKey.equals(mEdtApiKey.getText().toString()) ){
                 // Both credentials present and Uri credentials are different
                 // Ask user if he wants to replace with Uri
@@ -108,6 +112,7 @@ public class AuthenticationFragment extends Fragment implements OnClickListener,
                                         mEdtEmail.setText(uriEmail);
                                         mEdtApiKey.setText(uriApiKey);
                                         mEdtPackageName.setText(uriPackageName);
+                                        mAlternativeUrl = uriAlternativeUrl;
                                     }
                                 })
                         .setNegativeButton(R.string.no, null).create().show();
@@ -178,7 +183,7 @@ public class AuthenticationFragment extends Fragment implements OnClickListener,
             final String uriPackageName = customURI.getQueryParameter("BDPointPackageName");
             final String uriApiKey = customURI.getQueryParameter("BDPointAPIKey");
             final String uriEmail = customURI.getQueryParameter("BDPointUsername");
-            mAlternativeUrl = customURI.getQueryParameter("BDPointAPIUrl");
+            final String uriAlternativeUrl = customURI.getQueryParameter("BDPointAPIUrl");
 
             // Now decide which credentials to put onto UI
             if (uriApiKey != null && mEdtApiKey.getText().length() == 0){
@@ -186,6 +191,9 @@ public class AuthenticationFragment extends Fragment implements OnClickListener,
                 mEdtEmail.setText(uriEmail);
                 mEdtApiKey.setText(uriApiKey);
                 mEdtPackageName.setText(uriPackageName);
+                if(uriAlternativeUrl != null) {
+                    mAlternativeUrl = uriAlternativeUrl;
+                }
             } else if ( ! uriApiKey.equals(mEdtApiKey.getText().toString()) ){
                 // Both credentials present and Uri credentials are different
                 // Ask user if he wants to replace with Uri
@@ -201,6 +209,7 @@ public class AuthenticationFragment extends Fragment implements OnClickListener,
                                         mEdtEmail.setText(uriEmail);
                                         mEdtApiKey.setText(uriApiKey);
                                         mEdtPackageName.setText(uriPackageName);
+                                        mAlternativeUrl = uriAlternativeUrl;
                                     }
                                 })
                         .setNegativeButton(R.string.no, null).create().show();
@@ -244,6 +253,7 @@ public class AuthenticationFragment extends Fragment implements OnClickListener,
                     .putString(AppConstants.KEY_API_KEY, mEdtApiKey.getText().toString())
                     .putString(AppConstants.KEY_USERNAME, mEdtEmail.getText().toString())
                     .putString(AppConstants.KEY_PACKAGE_NAME, mEdtPackageName.getText().toString())
+                    .putString(AppConstants.KEY_URL,mAlternativeUrl)
                     .commit();
         }
 

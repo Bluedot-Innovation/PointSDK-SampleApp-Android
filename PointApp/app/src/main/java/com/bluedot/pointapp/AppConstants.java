@@ -13,4 +13,6 @@ public class AppConstants {
     public static final String KEY_PACKAGE_NAME = "package_name";
 
     public static final String KEY_API_KEY = "api_key";
+
+    public static final String KEY_URL = "url";
 }
