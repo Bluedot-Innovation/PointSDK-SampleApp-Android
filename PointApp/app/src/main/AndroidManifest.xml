@@ -3,8 +3,8 @@
     xmlns:tools="http://schemas.android.com/tools"
     tools:overrideLibrary="au.com.bluedot.point"
     package="com.bluedotinnovation.android.pointapp"
-    android:versionCode="27"
-    android:versionName="1.9.1">
+    android:versionCode="28"
+    android:versionName="1.9.2">
 
     <uses-sdk
         android:minSdkVersion="14"
@@ -16,7 +16,6 @@
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
-    <uses-permission android:name="android.permission.VIBRATE" />
 
     <!-- Required for Beacons integration -->
     <uses-permission android:name="android.permission.BLUETOOTH" />
