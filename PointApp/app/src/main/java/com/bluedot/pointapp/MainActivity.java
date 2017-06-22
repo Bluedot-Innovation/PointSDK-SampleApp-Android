@@ -2,7 +2,10 @@ package com.bluedot.pointapp;
 
 import android.app.AlertDialog;
 import android.app.AlertDialog.Builder;
+import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.app.ProgressDialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.location.Location;
@@ -10,6 +13,7 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentTabHost;
+import android.support.v4.app.NotificationCompat;
 import android.text.Html;
 import android.text.method.LinkMovementMethod;
 import android.widget.TextView;
@@ -19,6 +23,7 @@ import com.bluedotinnovation.android.pointapp.R;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Random;
 
 import au.com.bluedot.application.model.Proximity;
 import au.com.bluedot.application.model.geo.Fence;
@@ -55,6 +60,9 @@ public class MainActivity extends FragmentActivity implements
     // storage for credentials update which may happen while app is paused
     private Bundle scheduledCredentialsUpdate = null;
 
+    // To determine whether current activity is visible
+    private boolean isActivityPaused = false;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -85,19 +93,27 @@ public class MainActivity extends FragmentActivity implements
 
         //Get an instance of ServiceManager
         mServiceManager = ServiceManager.getInstance(this);
-       
+
         //Setup the notification icon to display when a notification action is triggered
         mServiceManager.setNotificationIDResourceID(R.drawable.ic_launcher);
-        
+
         //Setup the notification activity to start when a fired notification is clicked 
         mServiceManager.setCustomMessageAction(MainActivity.class);
 
+        // Android O handling - Set the foreground Service Notification which will fire only if running on Android O and above
+        Intent actionIntent = new Intent(this, MainActivity.class);
+        PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, actionIntent, PendingIntent.FLAG_UPDATE_CURRENT );
+        mServiceManager.setForegroundServiceNotification(R.drawable.ic_launcher, getString(R.string.foreground_notification_title), getString(R.string.foreground_notification_text), pendingIntent);
+
         mProgress = new ProgressDialog(this);
         mProgress.setCancelable(false);
+
+        mTabHost.getTabWidget().getChildTabViewAt(TAB_CHECKLIST).setClickable(false);
+        mTabHost.getTabWidget().getChildTabViewAt(TAB_MAP).setClickable(false);
     }
 
     @Override
-    protected void onNewIntent (Intent intent){
+    protected void onNewIntent(Intent intent) {
         if (intent != null && intent.getData() != null) {
             // get new credentials from resuming intent
             scheduledCredentialsUpdate = new Bundle();
@@ -109,7 +125,7 @@ public class MainActivity extends FragmentActivity implements
     //stop the Bluedot Point Service
     public void stopService() {
         if (mServiceManager != null) {
-        	//Call the method stopPointService in ServiceManager to stop Bluedot PointService
+            //Call the method stopPointService in ServiceManager to stop Bluedot PointService
             mServiceManager.stopPointService();
             if (mTabHost != null) {
                 refreshCurrentFragment(mTabHost.getCurrentTab());
@@ -123,8 +139,8 @@ public class MainActivity extends FragmentActivity implements
     @Override
     protected void onResume() {
         super.onResume();
+        isActivityPaused = false;
         mServiceManager.addBlueDotPointServiceStatusListener(this);
-        mServiceManager.subscribeForApplicationNotification(this);
         serviceStarted = mServiceManager.isBlueDotPointServiceRunning();
         if (scheduledCredentialsUpdate == null) {
             refreshCurrentFragment(mTabHost.getCurrentTab());
@@ -148,7 +164,11 @@ public class MainActivity extends FragmentActivity implements
 //            }
 //        }
         String messageTitle = "CheckIn " + zoneInfo.getZoneName();
-        fireDialog(messageTitle, messageText);
+        if (!isActivityPaused) {
+            fireDialog(messageTitle, messageText);
+        } else {
+            fireNotification(messageTitle, messageText);
+        }
     }
 
     @Override
@@ -161,7 +181,11 @@ public class MainActivity extends FragmentActivity implements
 //            }
 //        }
         String messageTitle = "CheckOut " + zoneInfo.getZoneName();
-        fireDialog(messageTitle, messageText);
+        if (!isActivityPaused) {
+            fireDialog(messageTitle, messageText);
+        } else {
+            fireNotification(messageTitle, messageText);
+        }
     }
 
     @Override
@@ -174,7 +198,11 @@ public class MainActivity extends FragmentActivity implements
 //            }
 //        }
         String messageTitle = "CheckIn " + zoneInfo.getZoneName();
-        fireDialog(messageTitle, messageText);
+        if (!isActivityPaused) {
+            fireDialog(messageTitle, messageText);
+        } else {
+            fireNotification(messageTitle, messageText);
+        }
     }
 
     @Override
@@ -187,10 +215,14 @@ public class MainActivity extends FragmentActivity implements
 //            }
 //        }
         String messageTitle = "CheckOut " + zoneInfo.getZoneName();
-        fireDialog(messageTitle, messageText);
+        if (!isActivityPaused) {
+            fireDialog(messageTitle, messageText);
+        } else {
+            fireNotification(messageTitle, messageText);
+        }
     }
 
-    private void fireDialog(final String title, final String message){
+    private void fireDialog(final String title, final String message) {
         try {
             runOnUiThread(new Runnable() {
                 @Override
@@ -221,7 +253,7 @@ public class MainActivity extends FragmentActivity implements
         mProgress.setMessage(getString(R.string.please_wait_authenticating));
         mProgress.show();
 
-        if (url == null){
+        if (url == null) {
             // no alternative url provided
             mServiceManager.sendAuthenticationRequest(packageName, apiKey, email, this, restartMode);
         } else {
@@ -231,6 +263,13 @@ public class MainActivity extends FragmentActivity implements
 
     public void refreshCurrentFragment(int tabIndex) {
         switch (tabIndex) {
+//            case TAB_AUTH:
+//                AuthenticationFragment authFragment = (AuthenticationFragment) getSupportFragmentManager()
+//                        .findFragmentByTag(mTabHost.getCurrentTabTag());
+//                if (authFragment != null) {
+//                    authFragment.refresh();
+//                }
+//                break;
             case TAB_MAP:
                 PointMapFragment pointMapFragment = (PointMapFragment) getSupportFragmentManager()
                         .findFragmentByTag(mTabHost.getCurrentTabTag());
@@ -255,6 +294,7 @@ public class MainActivity extends FragmentActivity implements
     protected void onPause() {
         super.onPause();
 
+        isActivityPaused = true;
         if (mProgress != null && mProgress.isShowing()) {
             mProgress.dismiss();
         }
@@ -264,9 +304,6 @@ public class MainActivity extends FragmentActivity implements
         }
 
         mServiceManager.removeBlueDotPointServiceStatusListener(this);
-
-        mServiceManager.unsubscribeForApplicationNotification(this);
-
 
     }
 
@@ -302,6 +339,10 @@ public class MainActivity extends FragmentActivity implements
         serviceStarted = true;
 
         mTabHost.setCurrentTab(TAB_MAP);
+        mTabHost.getTabWidget().getChildTabViewAt(TAB_CHECKLIST).setClickable(true);
+        mTabHost.getTabWidget().getChildTabViewAt(TAB_MAP).setClickable(true);
+
+        mServiceManager.subscribeForApplicationNotification(this);
     }
 
     //This is called when Bluedot Point Service stopped. Your app could clear and release resources 
@@ -312,11 +353,15 @@ public class MainActivity extends FragmentActivity implements
 
         serviceStarted = false;
 
+        mServiceManager.unsubscribeForApplicationNotification(this);
+
         refreshCurrentFragment(mTabHost.getCurrentTab());
+        mTabHost.getTabWidget().getChildTabViewAt(TAB_CHECKLIST).setClickable(false);
+        mTabHost.getTabWidget().getChildTabViewAt(TAB_MAP).setClickable(false);
     }
 
-    //This is invoked when Bluedot Point Service got error. You can call isFatal() method to check if the error is fatal. 
-    //The Bluedot Point Service will stop itself if the error is fatal, then the onBlueDotPointServiceStop() is called 
+    //This is invoked when Bluedot Point Service got error. You can call isFatal() method to check if the error is fatal.
+    //The Bluedot Point Service will stop itself if the error is fatal, then the onBlueDotPointServiceStop() is called
     @Override
     public void onBlueDotPointServiceError(final BDError bdError) {
         // if bdError is not fatal - service is still and authentication in progress. No need to shut mProgress.
@@ -326,31 +371,41 @@ public class MainActivity extends FragmentActivity implements
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                new Builder(MainActivity.this).setTitle(bdError.isFatal()?"Error":"Notice").setMessage(bdError.getReason()).setPositiveButton("OK", null).create().show();
+                new Builder(MainActivity.this).setTitle(bdError.isFatal() ? "Error" : "Notice").setMessage(bdError.getReason()).setPositiveButton("OK", null).create().show();
             }
         });
     }
 
     @Override
     public void onRuleUpdate(final List<ZoneInfo> zoneInfos) {
-            runOnUiThread(new Runnable() {
-                @Override
-                public void run() {
-                    if(zoneInfos==null || zoneInfos.isEmpty()) {
-                        AlertDialog alertDialog =  new AlertDialog.Builder(MainActivity.this).setTitle("Information")
-                                .setMessage(Html.fromHtml(getResources().getString(R.string.empty_ruleset)))
-                                .setPositiveButton("OK", null).create();
-                        alertDialog.show();
-                        TextView textView = (TextView) alertDialog.findViewById(android.R.id.message);
-                        textView.setMovementMethod(LinkMovementMethod.getInstance());
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                if (zoneInfos == null || zoneInfos.isEmpty()) {
+                    AlertDialog alertDialog = new AlertDialog.Builder(MainActivity.this).setTitle("Information")
+                            .setMessage(Html.fromHtml(getResources().getString(R.string.empty_ruleset)))
+                            .setPositiveButton("OK", null).create();
+                    alertDialog.show();
+                    TextView textView = (TextView) alertDialog.findViewById(android.R.id.message);
+                    textView.setMovementMethod(LinkMovementMethod.getInstance());
 
-                    }
-                    if (mTabHost.getCurrentTab() == TAB_MAP) {
-                        refreshCurrentFragment(TAB_MAP);
-                    }
                 }
-            });
+                if (mTabHost.getCurrentTab() == TAB_MAP) {
+                    refreshCurrentFragment(TAB_MAP);
+                }
+            }
+        });
 
+    }
+
+    private void fireNotification(String notificationTitle, String notificiationMessage) {
+        NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(this);
+        mBuilder.setSmallIcon(R.drawable.ic_launcher);
+        mBuilder.setContentTitle("CustAction: " + notificationTitle);
+        mBuilder.setContentText(notificiationMessage);
+        NotificationManager mNotificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+
+        mNotificationManager.notify(new Random().nextInt(), mBuilder.build());
     }
 
 }
