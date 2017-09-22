@@ -26,11 +26,11 @@ import java.util.Map;
 import java.util.Random;
 
 import au.com.bluedot.application.model.Proximity;
-import au.com.bluedot.application.model.geo.Fence;
 import au.com.bluedot.point.ApplicationNotificationListener;
 import au.com.bluedot.point.net.engine.BDError;
 import au.com.bluedot.point.ServiceStatusListener;
 import au.com.bluedot.point.net.engine.BeaconInfo;
+import au.com.bluedot.point.net.engine.FenceInfo;
 import au.com.bluedot.point.net.engine.LocationInfo;
 import au.com.bluedot.point.net.engine.ZoneInfo;
 import au.com.bluedot.point.net.engine.ServiceManager;
@@ -103,7 +103,7 @@ public class MainActivity extends FragmentActivity implements
         // Android O handling - Set the foreground Service Notification which will fire only if running on Android O and above
         Intent actionIntent = new Intent(this, MainActivity.class);
         PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, actionIntent, PendingIntent.FLAG_UPDATE_CURRENT );
-        mServiceManager.setForegroundServiceNotification(R.drawable.ic_launcher, getString(R.string.foreground_notification_title), getString(R.string.foreground_notification_text), pendingIntent);
+        mServiceManager.setForegroundServiceNotification(R.drawable.ic_launcher, getString(R.string.foreground_notification_title), getString(R.string.foreground_notification_text), pendingIntent, false);
 
         mProgress = new ProgressDialog(this);
         mProgress.setCancelable(false);
@@ -155,7 +155,7 @@ public class MainActivity extends FragmentActivity implements
         }
     }
     @Override
-    public void onCheckIntoFence(Fence fence, ZoneInfo zoneInfo, LocationInfo location, Map<String, String> customData, boolean isCheckOut) {
+    public void onCheckIntoFence(FenceInfo fenceInfo, ZoneInfo zoneInfo, LocationInfo location, Map<String, String> customData, boolean isCheckOut) {
         String messageText = "";
 // uncomment to display custom data
 //        if (customData!=null && !(customData.isEmpty())) {
@@ -172,7 +172,7 @@ public class MainActivity extends FragmentActivity implements
     }
 
     @Override
-    public void onCheckedOutFromFence(Fence fence, ZoneInfo zoneInfo, int dwellTime, Map<String, String> customData) {
+    public void onCheckedOutFromFence(FenceInfo fenceInfo, ZoneInfo zoneInfo, int dwellTime, Map<String, String> customData) {
         String messageText = "dwellTime,min=" + dwellTime + "\n";
 // uncomment to display custom data
 //        if (customData!=null && !(customData.isEmpty())) {
