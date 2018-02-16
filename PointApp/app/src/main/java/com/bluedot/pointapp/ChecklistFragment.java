@@ -22,11 +22,12 @@ import java.util.ArrayList;
 
 import au.com.bluedot.application.model.geo.Fence;
 import au.com.bluedot.point.net.engine.BeaconInfo;
+import au.com.bluedot.point.net.engine.FenceInfo;
 import au.com.bluedot.point.net.engine.ZoneInfo;
 
 /*
  * @author Bluedot Innovation
- * Copyright (c) 2016 Bluedot Innovation. All rights reserved.
+ * Copyright (c) 2018 Bluedot Innovation. All rights reserved.
  */
 public class ChecklistFragment extends Fragment {
 
@@ -100,7 +101,7 @@ public class ChecklistFragment extends Fragment {
             for (ZoneInfo zoneInfo : zones) {
                 mHeaderItems.add(new HeaderItem(zoneInfo.getZoneName(), zoneInfo.getZoneId()));
                 ArrayList<ListItem> mZoneItems = new ArrayList<ListItem>();
-                for (Fence fence : zoneInfo.getFences()) {
+                for (FenceInfo fence : zoneInfo.getFences()) {
                     boolean isCheckedIn = false;
                     mZoneItems.add(new ListItem(fence, isCheckedIn));
                 }

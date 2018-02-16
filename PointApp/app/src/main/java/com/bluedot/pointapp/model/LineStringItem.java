@@ -5,7 +5,7 @@ import com.google.android.gms.maps.model.PolylineOptions;
 
 /*
  * @author Bluedot Innovation
- * Copyright (c) 2016 Bluedot Innovation. All rights reserved.
+ * Copyright (c) 2018 Bluedot Innovation. All rights reserved.
  */
 public class LineStringItem extends MapItem{
 

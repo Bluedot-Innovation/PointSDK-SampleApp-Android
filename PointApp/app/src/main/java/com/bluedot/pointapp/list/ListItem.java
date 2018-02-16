@@ -1,18 +1,18 @@
 package com.bluedot.pointapp.list;
 
-import au.com.bluedot.application.model.geo.Fence;
 import au.com.bluedot.point.net.engine.BeaconInfo;
+import au.com.bluedot.point.net.engine.FenceInfo;
 
 /*
  * @author Bluedot Innovation
- * Copyright (c) 2016 Bluedot Innovation. All rights reserved.
+ * Copyright (c) 2018 Bluedot Innovation. All rights reserved.
  */
 public class ListItem {
-	private Fence mFence;
+	private FenceInfo mFence;
     private BeaconInfo mBeacon;
 	private boolean mIsCheckedIn;
 
-	public ListItem(Fence fence, boolean isCheckedIn) {
+	public ListItem(FenceInfo fence, boolean isCheckedIn) {
 		this.mFence = fence;
 		this.mIsCheckedIn = isCheckedIn;
 	}

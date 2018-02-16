@@ -8,7 +8,6 @@ import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.location.Location;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
@@ -37,7 +36,7 @@ import au.com.bluedot.point.net.engine.ServiceManager;
 
 /*
  * @author Bluedot Innovation
- * Copyright (c) 2016 Bluedot Innovation. All rights reserved.
+ * Copyright (c) 2018 Bluedot Innovation. All rights reserved.
  */
 public class MainActivity extends FragmentActivity implements
         ServiceStatusListener,

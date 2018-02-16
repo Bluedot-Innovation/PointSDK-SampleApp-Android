@@ -29,6 +29,7 @@ import au.com.bluedot.model.geo.LineString;
 import au.com.bluedot.model.geo.Point;
 import au.com.bluedot.model.geo.Polygon;
 import au.com.bluedot.point.net.engine.BeaconInfo;
+import au.com.bluedot.point.net.engine.FenceInfo;
 import au.com.bluedot.point.net.engine.ZoneInfo;
 
 import com.bluedot.pointapp.model.BoundingBoxItem;
@@ -39,6 +40,7 @@ import com.bluedot.pointapp.model.PolygonItem;
 import com.bluedotinnovation.android.pointapp.R;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.CameraPosition;
@@ -55,7 +57,7 @@ import com.google.maps.android.clustering.view.DefaultClusterRenderer;
 
 /*
  * @author Bluedot Innovation
- * Copyright (c) 2016 Bluedot Innovation. All rights reserved.
+ * Copyright (c) 2018 Bluedot Innovation. All rights reserved.
  */
 public class PointMapFragment extends SupportMapFragment implements LocationListener, View.OnTouchListener, ClusterManager.OnClusterClickListener, ClusterManager.OnClusterItemClickListener<MapItem>, GoogleMap.OnMapClickListener{
 
@@ -121,7 +123,20 @@ public class PointMapFragment extends SupportMapFragment implements LocationList
 	public void onViewCreated(View view, Bundle savedInstanceState) {
 		super.onViewCreated(view, savedInstanceState);
 		mIsInBackbround = false;
-		mMap = getMap();
+
+		getMapAsync(new OnMapReadyCallback() {
+			@Override
+			public void onMapReady(GoogleMap googleMap) {
+				mMap = googleMap;
+				setupMap();
+			}
+		});
+
+
+	}
+
+	private void setupMap() {
+
 		if (mMap != null) {
 			mMap.setBuildingsEnabled(true);
 			if(getLastKnownPosition()!=null){
@@ -133,13 +148,13 @@ public class PointMapFragment extends SupportMapFragment implements LocationList
 
 			// Initialise cluster manager
 			clusterManager = new ClusterManager<MapItem>(mActivity, mMap);
-			mMap.setOnCameraChangeListener(clusterManager);
 			clusterManager.setRenderer(new FenceRender(mActivity, mMap, clusterManager));
 			clusterManager.setOnClusterItemClickListener(this);
 			clusterManager.setOnClusterClickListener(this);
 			mMap.setOnMarkerClickListener(clusterManager);
 			mMap.setOnMapClickListener(this);
 			mLocationManager = (LocationManager) mActivity.getSystemService(Context.LOCATION_SERVICE);
+			refresh();
 		}
 	}
 
@@ -152,8 +167,11 @@ public class PointMapFragment extends SupportMapFragment implements LocationList
 		switch (event.getAction() & MotionEvent.ACTION_MASK)
 		{
 			case MotionEvent.ACTION_DOWN:
-				mMap.setMyLocationEnabled(true);
+
 				if(checkPermission()) {
+					if (mMap != null) {
+						mMap.setMyLocationEnabled(true);
+					}
 					mLocationManager.requestSingleUpdate(LocationManager.PASSIVE_PROVIDER, this, null);
 				}
 				break;
@@ -188,7 +206,7 @@ public class PointMapFragment extends SupportMapFragment implements LocationList
 	/**
 	 * Put the fence on the map
 	 */
-    private void displayFenceOnMap(Fence fence, ZoneInfo zoneInfo) {
+    private void displayFenceOnMap(FenceInfo fence, ZoneInfo zoneInfo) {
         int color = 0x55880000;
         if (fence.getGeometry() instanceof Circle) {
             Circle circle = (Circle) fence.getGeometry();
@@ -304,14 +322,16 @@ public class PointMapFragment extends SupportMapFragment implements LocationList
     }
 
 	private void loadDetails(ArrayList<ZoneInfo> zonesInfo) {
-		mMap.clear();
-		clusterManager.clearItems();
-        Log.i(TAG, "Zone size: " + zonesInfo.size());
+		if (mMap != null) {
+			mMap.clear();
+			clusterManager.clearItems();
+		}
+		Log.i(TAG, "Zone size: " + zonesInfo.size());
         for (ZoneInfo zoneInfo : zonesInfo) {
             //	printMessage("Zone Name ::: " + zoneInfo.getZoneName());
             try {
                 if (mMap != null) {
-                    for (Fence fence : zoneInfo.getFences()) {
+                    for (FenceInfo fence : zoneInfo.getFences()) {
                         displayFenceOnMap(fence, zoneInfo);
                     }
                     for (BeaconInfo beacon : zoneInfo.getBeacons()) {
@@ -327,7 +347,9 @@ public class PointMapFragment extends SupportMapFragment implements LocationList
             }
         }
         // Push cluster manager to update map
-        clusterManager.cluster();
+		if (mMap != null) {
+			clusterManager.cluster();
+		}
 	}
 
 	@Override
@@ -365,8 +387,10 @@ public class PointMapFragment extends SupportMapFragment implements LocationList
 
 	@Override
 	public boolean onClusterClick(Cluster cluster){
-		CameraPosition cameraPosition = mMap.getCameraPosition();
-		mMap.animateCamera(CameraUpdateFactory.zoomTo(cameraPosition.zoom + 1), CAMERA_ANIMATION_ms, null);
+		if (mMap != null) {
+			CameraPosition cameraPosition = mMap.getCameraPosition();
+			mMap.animateCamera(CameraUpdateFactory.zoomTo(cameraPosition.zoom + 1), CAMERA_ANIMATION_ms, null);
+		}
 		return true;
 	}
 
@@ -395,18 +419,20 @@ public class PointMapFragment extends SupportMapFragment implements LocationList
 
 	private void addFence(MapItem item) {
 		lastMapItem =item;
-		if(item instanceof CircleItem) {
-			com.google.android.gms.maps.model.Circle c = mMap.addCircle((CircleOptions) item.getGeometry());
-			lastDrawFence = c;
-		}else if(item instanceof PolygonItem){
-			com.google.android.gms.maps.model.Polygon p = mMap.addPolygon((PolygonOptions)item.getGeometry());
-			lastDrawFence = p;
-		}else if(item instanceof BoundingBoxItem){
-			com.google.android.gms.maps.model.Polygon box =  mMap.addPolygon((PolygonOptions) item.getGeometry());
-			lastDrawFence = box;
-		}else if(item instanceof LineStringItem){
-			Polyline ls =  mMap.addPolyline((PolylineOptions) item.getGeometry());
-			lastDrawFence = ls;
+		if (mMap != null) {
+			if(item instanceof CircleItem) {
+                com.google.android.gms.maps.model.Circle c = mMap.addCircle((CircleOptions) item.getGeometry());
+                lastDrawFence = c;
+            }else if(item instanceof PolygonItem){
+                com.google.android.gms.maps.model.Polygon p = mMap.addPolygon((PolygonOptions)item.getGeometry());
+                lastDrawFence = p;
+            }else if(item instanceof BoundingBoxItem){
+                com.google.android.gms.maps.model.Polygon box =  mMap.addPolygon((PolygonOptions) item.getGeometry());
+                lastDrawFence = box;
+            }else if(item instanceof LineStringItem){
+                Polyline ls =  mMap.addPolyline((PolylineOptions) item.getGeometry());
+                lastDrawFence = ls;
+            }
 		}
 	}
 
@@ -421,7 +447,9 @@ public class PointMapFragment extends SupportMapFragment implements LocationList
 		if (location != null)
 		{
 			if (location.getAccuracy() < ACCURACY_LEVEL_m) {
-				mMap.animateCamera(CameraUpdateFactory.newLatLng(new LatLng(location.getLatitude(), location.getLongitude())), CAMERA_ANIMATION_ms, null);
+				if (mMap != null) {
+					mMap.animateCamera(CameraUpdateFactory.newLatLng(new LatLng(location.getLatitude(), location.getLongitude())), CAMERA_ANIMATION_ms, null);
+				}
 				requestAnotherUpdate = false;
 			}
 		}
