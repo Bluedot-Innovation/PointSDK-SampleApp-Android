@@ -1,8 +1,3 @@
-# PointSDK-SampleApp-Android-IDEA
-To use this sample project, you first need to obtain the Point SDK as a zip file by registering for a free account at:
-
-https://www.pointaccess.bluedot.com.au
-
-Download the Android SDK zip file, either when prompted or from Downloads area of your account dashboard. After unzipping the bluedot-point-sdk-release.jar into the PointApp/app/libs/ folder, you will be able to sync / build the project.
-
-More developer documentation is available at http://docs.bluedotinnovation.com/
+# PointSDK-SampleApp-Android
+## Deprecated
+This sample project has been deprecated and is no longer maintained. Please checkout the [Minimal Integration Example](https://github.com/Bluedot-Innovation/PointSDK-MinimalIntegrationExample-Android) project for Bluedot Point SDK integration sample code and best practices.
